@@ -1,0 +1,13 @@
+from enum import Enum
+
+NOISE_STD = 5
+THRED_OLS_LIMIT = 5
+THRED_TS_LIMIT = 6
+MIN_RATIO_OUTLIER = 0.7
+MIN_ANOMALY_SCORE = 4
+COLOR_CYCLE = ["#4286f4", "#f44174"]
+
+class TS_DETECTOR_MODE(Enum):
+    SMOOTH = 3
+    ROBUST = 2
+    SENSITIVE = 1
