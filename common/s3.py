@@ -32,7 +32,7 @@ def StoreDataToS3:
     	except ClientError:
     		return False
 
-	def upload_asset(self, filename: str, extend_key: Optional[str, List[str]] = None) -> None:
+    def upload_asset(self, filename: str, extend_key: Optional[str, List[str]] = None) -> None:
         key = _build_full_path(self.key, extend_key)
         self.client.upload_file(Filename=filename, Bucket=self.bucket, Key=key)
         logger.info(f"Uploaded file {filename} to {self.bucket}:{key}")
@@ -47,9 +47,9 @@ def StoreDataToS3:
     	response = self.resource.Object(self.bucket, key).delete()
     	assert response['ResponseMetadata']['HTTPStatusCode'] == 204
 
-	@overrides
-	def store(self, filename: str, extend_key: Optional[str, List[str]]=None, refresh: bool=False) -> bool:
-		key = _build_full_path(self.key, extend_key)
+    @overrides
+    def store(self, filename: str, extend_key: Optional[str, List[str]]=None, refresh: bool=False) -> bool:
+	key = _build_full_path(self.key, extend_key)
         if self.check_asset_existence(key) and not refresh:
             logger.debug(f"Asset {key} already exists on S3 and no refresh requirement. Skip uploading.")
             return False
