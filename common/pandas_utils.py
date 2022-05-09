@@ -10,6 +10,32 @@ np.set_printoptions(precision=3)
 pd.set_option('display.width', 100)
 
 
+def dummify_categorical_columns(df, categorical_columns=[]):
+    "Dummifies all categorical columns"
+    if not categorical_columns:
+        categorical_columns = df.select_dtypes(include="object").columns
+    return pd.get_dummies(df, columns=categorical_columns, drop_first=True)
+
+
+def map_categorical_to_numercial(categories):
+    """
+    Returns a function that will map categories to ordinal values based on the
+    order of the list of `categories` given. Ex.
+    If categories is ['A', 'B', 'C'] then the transformer will map
+    'A' -> 0, 'B' -> 1, 'C' -> 2.
+    """
+    return lambda categorical_value: categories.index(categorical_value)
+
+
+def transform_categorical_to_numercial(df, categorical_numerical_mapping):
+    "Transforms categorical columns to numerical columns"
+    transformers = {k: convert_categorical_to_numeric(v)
+                    for k, v in categorical_numerical_mapping.items()}
+    new_df = df.copy()
+    for col, transformer in transformers.items():
+        new_df[col] = new_df[col].map(transformer).astype('int64')
+    return new_df
+
 
 def merge_dataframes_by_columns(dfs: List[pd.DataFrame], key_columns=Union[str, List[str]], join_as: str=['left', 'right', 'inner', 'outer']
                                )-> pd.DataFrame:
@@ -73,6 +99,25 @@ class DataFrameSummary:
             df_metrics.append(cal_metrics)
         return merge_dataframes_by_columns(df_metrics, join_on=groupby_cols, join_as="inner")
 
+    def get_columns_w_missing_value(self, missing_limit: int=.9) -> List[str]:
+        """
+        Checks which columns have over specified percentage of missing values
+        Returns columns as a list
+        """
+        percent_missing = self.df_.isnull().mean()
+        series = percent_missing[percent_missing > missing_limit]
+        columns = series.index.to_list()
+        return columns
+
+
+    def drop_columns_w_many_nans(self, missing_limit: int=.9) -> pd.DataFrame:
+        """
+        Drops the columns whose missing value is bigger than missing percentage
+        """
+        cols_with_missing = self.view_columns_w_many_nans(missing_percent=missing_limit)
+        list_of_cols = cols_with_missing.index.to_list()
+        return self.df_.drop(columns=list_of_cols)
+
     def get_dimension(self, axis=None) -> int:
         dimensions = self.df_.shape
         if axis == 0:
@@ -105,8 +150,11 @@ class DataFrameSummary:
     def get_skewness(self):
         return self.df_.skew()
 
-    def get_histogram(self):
-        self.df_.hist()
+    def get_histogram(self, colnums=[]):
+        if colnums:
+            self.df_[colnums].hist()
+        else:
+            self.df_.hist()
         pyplot.show()
         pyplot.close()
 

@@ -1,17 +1,19 @@
 import os
 import time
-import pickle
+import hashlib
+
+# TODO: need a generic hash generator, support hashlib and pyhash
+def hash_text(text: str)-> str:
+    return hashlib.sha256(text.encode('utf-8')).hexdigest()
 
 
-def mkdir(path):
+def get_weeknum(dt):
     try:
-        os.makedirs(path)
-    except OSError as exc:
-        # Python >2.5
+        return int(dt.isocalender()[1])
+    except:
         pass
+    return None
 
-def delay_time(sleep_time = 160):
-    time.sleep(sleep_time)
 
 
 def flatten_nested(lst):
@@ -31,31 +33,3 @@ def flatten_nested(lst):
                 yield j
         else:
             yield i
-
-
-def save2pickle(file_path, data):
-    with open(file_path, 'wb') as infile:
-        pickle.dump(data, infile, protocol=pickle.HIGHEST_PROTOCOL)
-
-def load_from_pickle(file_path):
-    with open(file_path, 'rb') as outfile:
-        data = pickle.load(outfile)
-    return data
-
-def save_processed_records(file_path, data):
-    """save a dict of data one by one, in the order of processed"""
-    if not os.path.exists(file_path):
-        open(file_path, 'ab').close()
-    with open(file_path, 'ab') as outfile:
-        pickle.dump(data, outfile)
-    outfile.close()
-
-def load_processed_records(file_path):
-    data = []
-    try:
-        with open(file_path, 'rb') as infile:
-            while True:
-                data.append(pickle.load(infile))
-    except EOFError:
-        pass
-    return data

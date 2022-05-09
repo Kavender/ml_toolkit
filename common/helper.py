@@ -1,5 +1,4 @@
 from typing import Iterable, Any
-import json
 import random
 from numpy.random import uniform
 from numpy import float64
@@ -13,11 +12,9 @@ def uniform_seed(*args, **kwargs):
     return random_uniform(*args, **kwargs)
 
 
-def load_json(path_to_file: str):
-    "Helper function to load a JSON file"
-    with open(path_to_file) as file:
-        db = json.load(file)
-    return db
+def delay_time(sleep_time = 160):
+    time.sleep(sleep_time)
+
 
 # TODO: add ability to select random item with or without replacement
 def stream(data: Iterable[Any], batch_size: int, shuffled: bool):
