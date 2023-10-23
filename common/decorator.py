@@ -1,5 +1,10 @@
 import functools
-Import time
+import time
+import inspect
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def decorator(func):
     @functools.wraps(func)
@@ -17,19 +22,18 @@ def timer(func):
         start_time = time.perf_counter()
         value = func(*args, **kwargs)
         run_time = time.perf_counter() - start_time
-        print(f"Finish running {func.__name__!r} in {run_time:.4f} sec")
+        logger.info(f"Finish running {func.__name__!r} in {run_time:.4f} sec")
         return value
     return wrapper_timer
 
 
 def debug(func):
-    "Print function signature and return vaue"
+    """Log function signature and return value"""
     @functools.wraps(func)
     def wrapper_debug(*args, **kwargs):
-        args_repr = [repr(a) for a in args]
-        kwargs_repr = [f"{k} = {v!r}" for k, v in kwargs.items()]
-        print(f"Calling {func.__name__} ({signature})")
+        signature = f"{func.__name__}{inspect.signature(func)}"
+        logger.debug(f"Calling {signature}")
         value = func(*args, **kwargs)
-        print(f"{func.__name__!r} returns {value!r}")
+        logger.debug(f"{func.__name__!r} returns {value!r}")
         return value
     return wrapper_debug

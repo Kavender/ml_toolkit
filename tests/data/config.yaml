@@ -1,0 +1,13 @@
+"{\n        \"model\": {\n                \"type\": \"duplicate-test-tagger\",\n \
+  \               \"text_field_embedder\": {\n                        \"token_embedders\"\
+  : {\n                                \"tokens\": {\n                           \
+  \             \"type\": \"embedding\",\n                                       \
+  \ \"embedding_dim\": 5\n                                }\n                    \
+  \    }\n                },\n                \"encoder\": {\n                   \
+  \     \"type\": \"lstm\",\n                        \"input_size\": 5,\n        \
+  \                \"hidden_size\": 7,\n                        \"num_layers\": 2\n\
+  \                }\n        },\n        \"dataset_reader\": {\"type\": \"sequence_tagging\"\
+  },\n        \"train_data_path\": \"tests/data/sequence_tagging.tsv\",\n        \"\
+  validation_data_path\": \"tests/data/sequence_tagging.tsv\",\n        \"data_loader\"\
+  : {\"batch_size\": 2},\n        \"trainer\": {\n                \"num_epochs\":\
+  \ 2,\n                \"optimizer\": \"adam\"\n        }\n    }"
