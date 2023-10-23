@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Iterable
 import os
-import time
+import errno
 import hashlib
 from collections import OrderedDict
 
@@ -13,9 +13,13 @@ def ensure_path_exists(file_path):
             raise
 
 
-# TODO: need a generic hash generator, support hashlib and pyhash
-def hash_text(text: str)-> str:
-    return hashlib.sha256(text.encode('utf-8')).hexdigest()
+def hash_text(text: str, algo: str = 'sha256')-> str:
+    try:
+        hash_func = getattr(hashlib, algo)
+        return hash_func(text.encode('utf-8')).hexdigest()
+    except AttributeError:
+        raise ValueError(f"'{algo}' is not a supported algorithm in hashlib.")
+    
 
 
 def get_weeknum(dt):
@@ -26,21 +30,34 @@ def get_weeknum(dt):
     return None
 
 
-
-def flatten_nested(lst):
-    """Flatten a list with arbitrary levels of nesting.
+def flatten_nested(lst: Iterable) -> Iterable:
+    """
+    Flatten an iterable with arbitrary levels of nesting.
     source: http://stackoverflow.com/questions/10823877/
         what-is-the-fastest-way-to-flatten-arbitrarily-nested-lists-in-python
+    
     Args:
-        lst (list): The nested list.
-    Returns:
-        (generator): The new flattened list of words.
+        lst (Iterable): The nested iterable (e.g., list or tuple).
+        
+    Yields:
+        item: Items from the flattened iterable.
+        
+    Examples:
+        >>> list(flatten_nested([1, [2, 3], [4, [5, 6], 7], 8]))
+        [1, 2, 3, 4, 5, 6, 7, 8]
+        
+        >>> list(flatten_nested([1, (2, 3), [[4, 5], (6, 7)], 8]))
+        [1, 2, 3, 4, 5, 6, 7, 8]
     """
-    if not isinstance(lst, list):
-        yield []
+    # Check if lst is not an iterable or is a string, in which case yield the item itself
+    if not isinstance(lst, Iterable) or isinstance(lst, (str, bytes)):
+        yield lst
+        return
+    
     for i in lst:
-        if any([isinstance(i, list), isinstance(i, tuple)]):
-            for j in flatten(i):
+        # Check if an item is an iterable (but not a string)
+        if isinstance(i, Iterable) and not isinstance(i, (str, bytes)):
+            for j in flatten_nested(i):
                 yield j
         else:
             yield i

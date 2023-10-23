@@ -1,5 +1,3 @@
-from typing import Iterable
-import itertools
 import numpy as np
 
 def prepare_ts_for_detector(ts):

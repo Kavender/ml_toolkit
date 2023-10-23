@@ -1,8 +1,8 @@
 # /usr/bin/env python
 import pip
 import os, sys
-import pkg_resources
 import inspect, importlib as implib
+
 
 class BuildRequirments:
     """read existing requirement settings in text file, update version change
@@ -70,7 +70,7 @@ class BuildRequirments:
                     yield {module: sys.modules[module].__version__}
                 except:
                     try:
-                        if type(modules[module].version) is str:
+                        if type(sys.modules[module].version) is str:
                             yield {module :sys.modules[module].version}
                         else:
                             yield {module: sys.modules[module].version()}
